@@ -1,0 +1,8 @@
+coverage.out
+coverage.html
+*.test
+*.test.exe
+coverage
+*.prof
+__pycache__/
+*.pyc

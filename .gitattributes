@@ -1,0 +1,12 @@
+* text=auto eol=lf
+*.go text eol=lf
+*.mod text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.yml text eol=lf
+*.c text eol=lf
+*.h text eol=lf
+# Unified diffs require a single space on empty context lines.
+*.patch text eol=lf whitespace=-blank-at-eol
+*.pcm binary
+*.bin binary
