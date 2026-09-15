@@ -10,9 +10,9 @@ S. Andersen, A. Duric, H. Astrom, R. Hagen, W. Kleijn, and J. Linden.
 Original source copyright:
 Copyright (C) The Internet Society (2004). All Rights Reserved.
 
-The C source is retained in testdata/reference. The Go translation identifies
+The C source is retained in src/testdata/reference. The Go translation identifies
 its source in file headers. Decoder and PLC corrections are described in
-README.md and testdata/reference/corrections.patch. Subnormal cleanup and
+README.md and src/testdata/reference/corrections.patch. Subnormal cleanup and
 codebook-search optimizations are described in VALIDATION.md.
 
 Licensing basis

@@ -7,3 +7,6 @@ coverage
 __pycache__/
 *.pyc
 diagnostics/
+bin/
+cmd/talk/talk
+cmd/talk/talk.exe

@@ -104,7 +104,7 @@ The script builds and runs tests, repeats diagnostic benchmarks three times,
 collects a CPU profile, and fuzzes with four workers. Logs go under the ignored
 `diagnostics/` directory. Final optimization evidence is in
 `diagnostics/optimization/`. Preserve any failing reproducer under
-`testdata/fuzz`. A successful bounded campaign does not prove that no bugs exist.
+`src/testdata/fuzz`. A successful bounded campaign does not prove that no bugs exist.
 
 ## Remaining validation
 

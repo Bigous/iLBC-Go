@@ -28,11 +28,11 @@ if err := decoder.Conceal(output); err != nil { return err }
 Install the stable release:
 
 ```sh
-go get github.com/Bigous/iLBC-Go@v1.0.0
+go get github.com/Bigous/iLBC-Go/src@v1.0.0
 ```
 
-Import the package as `"github.com/Bigous/iLBC-Go"`; its package name is `ilbc`.
-[API documentation](https://pkg.go.dev/github.com/Bigous/iLBC-Go).
+Import the package as `"github.com/Bigous/iLBC-Go/src"`; its package name is `ilbc`.
+[API documentation](https://pkg.go.dev/github.com/Bigous/iLBC-Go/src).
 
 Reuse the buffers and keep one instance per stream. Instances retain history
 and must not be shared concurrently between goroutines. Independent instances
@@ -45,6 +45,20 @@ and automatic mode detection are outside the library's scope. Optional
 enhancement adds a delay of 40 samples in 20 ms mode and 80 samples in 30 ms
 mode. Packets with a loss marker or an invalid start index are handled by
 packet loss concealment (PLC). Size validation errors leave stream state unchanged.
+
+## Voice-call example
+
+The [talk example](cmd/talk/README.md) provides a bidirectional UDP voice call
+on Windows, Linux, and macOS, using the default microphone and audio output.
+It builds with `CGO_ENABLED=0`; its platform audio dependencies are isolated
+in a separate module under `cmd/talk`. The codec and fixtures are under `src`.
+
+```powershell
+.\tools\build-talk.ps1
+.\bin\talk.exe --serve 9000
+# On the other machine:
+.\bin\talk.exe --connect 192.168.1.10:9000
+```
 
 ## Performance
 
@@ -80,8 +94,8 @@ to open the HTML report in your default browser.
 go test ./... -coverprofile=coverage.out
 go tool cover -func=coverage.out
 go tool cover -html=coverage.out -o coverage.html
-go test -run=^$ -bench=. -benchmem
-go test -fuzz=FuzzDecode -fuzztime=60s
+go test ./src -run=^$ -bench=. -benchmem
+go test ./src -fuzz=FuzzDecode -fuzztime=60s
 ```
 
 **The current suite passes with 100.0% statement coverage** on Windows/amd64
@@ -101,7 +115,7 @@ requires identical encoded bytes and allows a maximum difference of one PCM unit
 across platforms; the Windows tests reported zero differences. This
 differential test corpus is not a complete conformance certification.
 
-The original C sources, corrections, and test vectors are in `testdata/`.
+The original C sources, corrections, and test vectors are in `src/testdata/`.
 `tools/generate_inputs.py` recreates the inputs, and `tools/generate_vectors.py`
 independently compiles the C reference and regenerates the expected results.
 Python and a C compiler are required only to regenerate these fixtures.
@@ -134,7 +148,7 @@ constant is 34, `i < lengthIn` in the extension starting at `lengthIn+2`, and
 a 20 ms start index greater than 3 in a two-bit field. Gain clamping uses
 `min`/`max` while preserving its limits.
 
-See `testdata/reference/corrections.patch` and the attribution notices in `LICENSE`.
+See `src/testdata/reference/corrections.patch` and the attribution notices in `LICENSE`.
 
 ## License
 

@@ -7,13 +7,13 @@ $ErrorActionPreference = 'Stop'
 $projectDir = Split-Path -Parent $PSScriptRoot
 $reportDir = Join-Path $projectDir 'diagnostics'
 New-Item -ItemType Directory -Path $reportDir -Force | Out-Null
-Push-Location $projectDir
+Push-Location (Join-Path $projectDir 'src')
 try {
     & go version | Tee-Object -FilePath (Join-Path $reportDir 'environment.txt')
     if ($LASTEXITCODE -ne 0) { throw 'go version failed' }
 
     # All commands respect the machine's existing application control policy.
-    & go test -c -o (Join-Path $reportDir 'ilbc.diagnostics.test.exe')
+    & go test . -c -o (Join-Path $reportDir 'ilbc.diagnostics.test.exe')
     if ($LASTEXITCODE -ne 0) { throw 'Diagnostic build failed' }
     $testBinary = Join-Path $reportDir 'ilbc.diagnostics.test.exe'
 
@@ -35,9 +35,9 @@ try {
         Tee-Object -FilePath (Join-Path $reportDir 'conceal-cpu.txt')
     if ($LASTEXITCODE -ne 0) { throw 'CPU profile analysis failed' }
 
-    & go test -run '^$' -fuzz '^FuzzDecode$' -fuzztime "${FuzzSeconds}s" -parallel 4 2>&1 |
+    & go test . -run '^$' -fuzz '^FuzzDecode$' -fuzztime "${FuzzSeconds}s" -parallel 4 2>&1 |
         Tee-Object -FilePath (Join-Path $reportDir 'fuzz.txt')
-    if ($LASTEXITCODE -ne 0) { throw 'Fuzzing failed; inspect diagnostics/fuzz.txt and testdata/fuzz' }
+    if ($LASTEXITCODE -ne 0) { throw 'Fuzzing failed; inspect diagnostics/fuzz.txt and src/testdata/fuzz' }
 } finally {
     Pop-Location
 }

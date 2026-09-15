@@ -1,5 +1,5 @@
 import pathlib, random, math, struct
-root=pathlib.Path(__file__).resolve().parent.parent/'testdata'
+root=pathlib.Path(__file__).resolve().parent.parent/'src'/'testdata'
 root.mkdir(exist_ok=True)
 for mode in (20,30):
     rng=random.Random(3951)

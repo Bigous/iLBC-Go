@@ -36,7 +36,7 @@ def correct(filename,s):
     return s
 
 def main():
-    data=ROOT/'testdata';reference=data/'reference'
+    data=ROOT/'src'/'testdata';reference=data/'reference'
     with tempfile.TemporaryDirectory(prefix='ilbc-reference-') as directory:
         build=pathlib.Path(directory)
         for src in (reference/'original').glob('*.[ch]'):

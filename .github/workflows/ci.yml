@@ -22,3 +22,38 @@ jobs:
       - run: go vet ./...
       - run: go test ./... -coverprofile=coverage.out
       - run: go tool cover -func=coverage.out
+
+  talk:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        go: ['stable']
+        include:
+          - os: ubuntu-latest
+            go: '1.22.x'
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: cmd/talk
+    env:
+      CGO_ENABLED: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+          cache: false
+      - run: go vet ./...
+      - run: go test ./... -count=1
+      - run: go build .
+
+  talk-race:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: false
+      - run: go -C cmd/talk test -race ./...

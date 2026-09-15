@@ -3,7 +3,7 @@ package ilbc_test
 import (
 	"fmt"
 
-	"github.com/Bigous/iLBC-Go"
+	"github.com/Bigous/iLBC-Go/src"
 )
 
 func ExampleEncoder_Encode() {

@@ -1,6 +1,6 @@
 # Publishing releases
 
-The public module path is `github.com/Bigous/iLBC-Go`. The Go package name is
+The public module path is `github.com/Bigous/iLBC-Go`. The package import path is `github.com/Bigous/iLBC-Go/src`. The Go package name is
 `ilbc`. Version 1 uses tags such as `v1.0.0` without a /v1 module suffix.
 
 ## Validate and release
@@ -10,7 +10,7 @@ From the repository root in PowerShell:
 ```powershell
 .\tools\coverage.ps1
 go vet ./...
-go test -run '^$' -fuzz FuzzDecode -fuzztime 60s -parallel 4
+go test ./src -run '^$' -fuzz FuzzDecode -fuzztime 60s -parallel 4
 git diff --check
 ```
 
@@ -46,7 +46,7 @@ so use a recent RFC3339 `since` timestamp when looking for a new release.
 Module paths containing uppercase letters use escaped forms in proxy URLs:
 `github.com/!bigous/i!l!b!c-!go`.
 
-Visit https://pkg.go.dev/github.com/Bigous/iLBC-Go@v1.0.0.
+Visit https://pkg.go.dev/github.com/Bigous/iLBC-Go@v1.0.0/src.
 If the page is not available yet, use its Request button. Processing and search
 visibility may lag behind proxy availability. Documentation display also
 depends on pkg.go.dev's license detection; retain accurate third-party terms
