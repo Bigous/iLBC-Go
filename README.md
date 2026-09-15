@@ -25,10 +25,14 @@ if err := decoder.Decode(output, packet); err != nil { return err }
 if err := decoder.Conceal(output); err != nil { return err }
 ```
 
-The local module is named `ilbc`. To use it in another project, add
-`require ilbc v0.0.0` and `replace ilbc => /path/to/ilbc` to `go.mod`,
-then import `"ilbc"`. Replace the module path with your repository's public
-address before publishing the library.
+Install the stable release:
+
+```sh
+go get github.com/Bigous/iLBC-Go@v1.0.0
+```
+
+Import the package as `"github.com/Bigous/iLBC-Go"`; its package name is `ilbc`.
+[API documentation](https://pkg.go.dev/github.com/Bigous/iLBC-Go).
 
 Reuse the buffers and keep one instance per stream. Instances retain history
 and must not be shared concurrently between goroutines. Independent instances
@@ -131,3 +135,12 @@ a 20 ms start index greater than 3 in a two-bit field. Gain clamping uses
 `min`/`max` while preserving its limits.
 
 See `testdata/reference/corrections.patch` and the attribution notices in `LICENSE`.
+
+## License
+
+Original project contributions are available under the [MIT license](LICENSE).
+The codec is derived from RFC 3951 Appendix A and retains its Internet Society
+copyright and applicable BCP 78 terms; it is not an MIT-only codebase.
+See [LICENSE-RFC3951](LICENSE-RFC3951) and [NOTICE](NOTICE) for the original
+notices, provenance, and the separate Google patent disclosure. Preserve all
+applicable notices when redistributing.

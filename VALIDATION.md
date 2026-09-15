@@ -109,8 +109,7 @@ collects a CPU profile, and fuzzes with four workers. Logs go under the ignored
 ## Remaining validation
 
 Other operating systems, architectures, and Go versions have not been measured
-in this local run. The GitHub workflow includes Go 1.22 and stable, but has not
-yet been executed remotely. Recheck performance on deployment hardware and
+in this local run. GitHub run 34972213321 passed on Ubuntu with Go 1.22 and stable on 2026-09-15, before the release metadata changes. Recheck performance on deployment hardware and
 consider longer fuzzing campaigns before release.
 
 Direct execution of the rebuilt repository coverage executable was blocked by Windows Application Control in this session. Validation through go test succeeded; no application control policy was changed.

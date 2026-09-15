@@ -2,7 +2,7 @@ package ilbc_test
 
 import (
 	"fmt"
-	"ilbc"
+	"github.com/Bigous/iLBC-Go"
 )
 
 func ExampleEncoder_Encode() {

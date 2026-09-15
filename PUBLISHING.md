@@ -1,28 +1,58 @@
-# Preparing for publication
+# Publishing releases
 
-The local repository is at `C:\dev\projects\iLBC-Go`.
+The public module path is `github.com/Bigous/iLBC-Go`. The Go package name is
+`ilbc`. Version 1 uses tags such as `v1.0.0` without a /v1 module suffix.
 
-Before the first publication:
+## Validate and release
 
-1. Run the test suite and review the outstanding items in `VALIDATION.md`:
+From the repository root in PowerShell:
 
-   ```powershell
-   go test ./... '-coverprofile=coverage.out'
-   go tool cover '-func=coverage.out'
-   go test -run '^$' -bench . -benchmem
-   go test -fuzz FuzzDecode -fuzztime 60s
-   ```
+```powershell
+.\tools\coverage.ps1
+go vet ./...
+go test -run '^$' -fuzz FuzzDecode -fuzztime 60s -parallel 4
+git diff --check
+```
 
-2. Preserve the confirmed 100% statement coverage when making changes.
-   The completed diagnostics and fuzzing campaigns are recorded in `VALIDATION.md`. Repeat relevant checks after subsequent code changes.
-3. Choose the public module path, such as `github.com/YOUR_USERNAME/iLBC-Go`,
-   and update the `module` directive in `go.mod`, the import in
-   `example_test.go`, and the installation examples in the README.
-4. Preserve the reference attribution in `LICENSE` and
-   `testdata/reference/`. Define the project's distribution terms with
-   the included reference source in mind.
-5. Configure the chosen remote and publish once the tests pass.
-   No remote or release was configured during this preparation.
+Keep 100% statement coverage, review reference comparisons, and wait for the
+GitHub Go 1.22 and stable jobs to pass on the release commit. Preserve LICENSE,
+LICENSE-RFC3951, NOTICE, and reference source notices when distributing.
 
-The workflow in `.github/workflows/ci.yml` runs tests and static analysis
-on GitHub with Go 1.22 and the stable release. It has not yet been executed.
+Commit and push the release changes, then create a tag on that tested commit:
+
+```powershell
+git tag -a v1.0.0 -m 'Release v1.0.0'
+git push origin v1.0.0
+gh release create v1.0.0 --verify-tag --title 'v1.0.0' --notes-file release-notes.md
+```
+
+Use a prepared release-notes file describing the public API and validation.
+For subsequent releases, substitute a new semantic version. Never move or
+reuse a published version tag. Breaking API changes after v1 require a new
+major version and the corresponding module-path suffix.
+
+## Request Go indexing
+
+After publishing the tag, request the version from the public Go proxy:
+
+```powershell
+$env:GOPROXY = 'https://proxy.golang.org'
+go mod download -json github.com/Bigous/iLBC-Go@v1.0.0
+```
+
+This publishes the module to the Go proxy cache and discovery feed; there is
+no separate upload operation for index.golang.org. The feed is chronological,
+so use a recent RFC3339 `since` timestamp when looking for a new release.
+Module paths containing uppercase letters use escaped forms in proxy URLs:
+`github.com/!bigous/i!l!b!c-!go`.
+
+Visit https://pkg.go.dev/github.com/Bigous/iLBC-Go@v1.0.0.
+If the page is not available yet, use its Request button. Processing and search
+visibility may lag behind proxy availability. Documentation display also
+depends on pkg.go.dev's license detection; retain accurate third-party terms
+even if an automated detector does not recognize them.
+
+Official instructions:
+- https://pkg.go.dev/about#adding-a-package
+- https://proxy.golang.org/
+- https://pkg.go.dev/license-policy

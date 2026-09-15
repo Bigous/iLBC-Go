@@ -1,0 +1,43 @@
+iLBC-Go third-party notices
+
+This library derives its codec implementation and tables from Appendix A of
+RFC 3951, "Internet Low Bit Rate Codec (iLBC)", December 2004.
+https://www.rfc-editor.org/rfc/rfc3951.html
+
+RFC authors:
+S. Andersen, A. Duric, H. Astrom, R. Hagen, W. Kleijn, and J. Linden.
+
+Original source copyright:
+Copyright (C) The Internet Society (2004). All Rights Reserved.
+
+The C source is retained in testdata/reference. The Go translation identifies
+its source in file headers. Decoder and PLC corrections are described in
+README.md and testdata/reference/corrections.patch. Subnormal cleanup and
+codebook-search optimizations are described in VALIDATION.md.
+
+Licensing basis
+
+RFC 3951 refers to BCP 78. At its December 2004 publication, RFC 3667 defined
+that policy. Section 3.3(a)(E) covers extraction, use, modification, distribution,
+and incorporation of executable code into other works for any purpose,
+subject to Section 5 notices.
+https://www.rfc-editor.org/rfc/rfc3667.html#section-3.3
+https://www.rfc-editor.org/rfc/rfc3667.html#section-5
+
+The original RFC copyright and disclaimer are reproduced in LICENSE-RFC3951.
+The MIT license in LICENSE applies to this project's original contributions;
+the RFC-derived material is not represented as originally MIT-licensed.
+We do not apply the later IETF BSD license retroactively to this 2004 RFC.
+The IETF Trust discusses pre-existing documents in TLP Section 2.
+https://trustee.ietf.org/documents/trust-legal-provisions/tlp-5/
+
+Patent disclosure
+
+Copyright licensing and patent licensing are separate. Google's 2011 IPR
+disclosure #1649 provides patent grants relating to the iLBC specification
+and its reference implementation, with conditions and limitations, including
+reciprocity for the specification grant and termination for specified patent
+litigation. Consult the actual declaration for its scope; this project does
+not grant third-party patent rights or assert that all modifications are
+covered by that declaration.
+https://datatracker.ietf.org/ipr/1649/
