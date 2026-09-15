@@ -138,6 +138,10 @@ func (d *Decoder) Conceal(dst []int16) error {
 }
 
 func (d *Decoder) decode(dst []int16, packet []byte, received int) {
+	// Recursive filters can retain subnormal tails after the PCM output has
+	// become silent. Clear these between frames to avoid costly arithmetic.
+	flushSubnormalHistory(d.state.syntMem[:])
+	flushSubnormalHistory(d.state.hpomem[:])
 	var block [240]float32
 	decodeFrame(span[float32]{data: block[:]}, span[byte]{data: packet}, &d.state, received)
 	var sample float32

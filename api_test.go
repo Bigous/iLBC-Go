@@ -3,6 +3,7 @@ package ilbc
 import (
 	"bytes"
 	"math/rand"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -148,6 +149,25 @@ func FuzzDecode(f *testing.F) {
 	f.Add([]byte{0}, true)
 	f.Add(bytes.Repeat([]byte{255}, 38), false)
 	f.Add(make([]byte, 50), true)
+	// Valid reference packets exercise the received-frame path immediately,
+	// rather than relying on mutations of empty/lost frames to reach it.
+	for _, fixture := range []struct {
+		name string
+		size int
+	}{{"testdata/encoded20.bin", 38}, {"testdata/encoded30.bin", 50}} {
+		packets, err := os.ReadFile(fixture.name)
+		if err != nil {
+			f.Fatal(err)
+		}
+		if len(packets) < 33*fixture.size {
+			f.Fatalf("reference fixture is too short: %s", fixture.name)
+		}
+		for _, frame := range []int{0, 8, 16, 24, 32} {
+			packet := packets[frame*fixture.size : (frame+1)*fixture.size]
+			f.Add(packet, false)
+			f.Add(packet, true)
+		}
+	}
 	f.Fuzz(func(t *testing.T, packet []byte, enhance bool) {
 		mode := Mode20
 		if len(packet) == 50 {

@@ -5,6 +5,18 @@ package ilbc
 
 import "math"
 
+// codebookDotProduct checks the vector extent once, allowing the compiler to
+// eliminate bounds checks inside the codebook search's innermost loop. Keep
+// accumulation sequential and round each product to match the RFC reference.
+func codebookDotProduct(left, right []float32) float32 {
+	right = right[:len(left)]
+	var sum float32
+	for i, value := range left {
+		sum += float32(value * right[i])
+	}
+	return sum
+}
+
 func searchCodebook(encoder *encoderState, index span[int], gainIndex span[int], intarget span[float32], mem span[float32], lMem int, lTarget int, nStages int, weightDenum span[float32], weightState span[float32], block int) {
 	var i int
 	var j int
@@ -63,12 +75,9 @@ func searchCodebook(encoder *encoderState, index span[int], gainIndex span[int],
 		maxMeasure[0] = float32(-1e+07)
 		gain[0] = float32(0)
 		bestIndex[0] = 0
-		crossDot = float32(0)
 		pp = span[float32]{data: buf[:], off: 10 + lMem + -lTarget}
-		for j = 0; j < lTarget; j++ {
-			crossDot += float32(target[j] * *pp.at(0))
-			pp = pp.add(1)
-		}
+		crossDot = codebookDotProduct(target[:lTarget], pp.slice(lTarget))
+		pp = pp.add(lTarget)
 		if stage == 0 {
 			ppe = span[float32]{data: energy[:]}
 			ppi = span[float32]{data: buf[:], off: 10 + lMem + -lTarget + -1}
@@ -99,12 +108,9 @@ func searchCodebook(encoder *encoderState, index span[int], gainIndex span[int],
 			gain[0] = ftmp
 		}
 		for icount = 1; icount < valueRange; icount++ {
-			crossDot = float32(0)
 			pp = span[float32]{data: buf[:], off: 10 + lMem + -lTarget + -icount}
-			for j = 0; j < lTarget; j++ {
-				crossDot += float32(target[j] * *pp.at(0))
-				pp = pp.add(1)
-			}
+			crossDot = codebookDotProduct(target[:lTarget], pp.slice(lTarget))
+			pp = pp.add(lTarget)
 			if stage == 0 {
 				*ppe.at(0) = energy[icount-1] + float32(*ppi.at(0)**ppi.at(0)) - float32(*ppo.at(0)**ppo.at(0))
 				ppe = ppe.add(1)
@@ -200,13 +206,10 @@ func searchCodebook(encoder *encoderState, index span[int], gainIndex span[int],
 			}
 		}
 		for icount = sInd; icount < eInd; icount++ {
-			crossDot = float32(0)
 			pp = span[float32]{data: cbvectors[:], off: lMem + -counter + -lTarget}
 			counter++
-			for j = 0; j < lTarget; j++ {
-				crossDot += float32(target[j] * *pp.at(0))
-				pp = pp.add(1)
-			}
+			crossDot = codebookDotProduct(target[:lTarget], pp.slice(lTarget))
+			pp = pp.add(lTarget)
 			if float64(energy[icount]) > float64(0) {
 				invenergy[icount] = float32(1) / (energy[icount] + float32(2.220446e-16))
 			} else {

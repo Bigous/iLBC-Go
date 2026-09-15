@@ -1,6 +1,6 @@
 # iLBC in Go
 
-A mono, 8 kHz, `int16` PCM audio encoder and decoder based on
+A mono, 8 kHz, `int16` PCM encoder and decoder based on
 [RFC 3951](https://www.rfc-editor.org/rfc/rfc3951.html). Requires Go 1.22 or later,
 with no external dependencies, CGo, or `unsafe`.
 
@@ -45,9 +45,9 @@ packet loss concealment (PLC). Size validation errors leave stream state unchang
 ## Performance
 
 Temporary buffers have fixed sizes and reside on the stack; output buffers
-belong to the caller. Initial benchmarks measured **0 B/op and 0 allocs/op**
-for Encode, Decode, and Conceal in both modes. Persistent state is allocated
-at construction. The audio processing path uses no locks, reflection, or interfaces.
+belong to the caller. Benchmarks measure **0 B/op and 0 allocs/op** for Encode,
+Decode, and Conceal in both modes. Persistent state is allocated at construction.
+The audio processing path uses no locks, reflection, or interfaces.
 
 The codec core uses `float32`, preserves the reference implementation's relevant
 rounding behavior, and uses `copy`/`clear` for buffer operations. The small private
@@ -55,12 +55,22 @@ rounding behavior, and uses `copy`/`clear` for buffer operations. The small priv
 checks. Explicit conversions on products prevent FMA fusion from changing the
 rounding order. Tables are private and read-only during processing.
 
+At frame boundaries, the decoder clears nonzero subnormal values (magnitudes
+below 2^-126) from synthesis and high-pass filter history. This prevents tiny
+silent tails from making repeated packet loss expensive, without changing CPU
+floating-point modes. Codebook dot products check vector lengths once before
+the inner loop, preserving sequential accumulation and product rounding.
+
 Core variable declarations precede loops, following the reference's organization.
 In Go, `:=` inside a loop does not imply heap allocation: escape analysis and
 value lifetimes determine allocation behavior. Allocation tests verify the
 result rather than inferring it from syntax.
 
 ## Testing and validation status
+
+On Windows, run `.\tools\coverage.ps1` to execute fresh coverage tests and
+generate text and HTML reports under `diagnostics/coverage/`. Add `-OpenReport`
+to open the HTML report in your default browser.
 
 ```text
 go test ./... -coverprofile=coverage.out
@@ -70,20 +80,22 @@ go test -run=^$ -bench=. -benchmem
 go test -fuzz=FuzzDecode -fuzztime=60s
 ```
 
-**Final validation is pending.** The last fully executed test suite reached
-**96.5% statement coverage**. API, DSP boundary, bit packing, arbitrary packet,
-allocation, and regression tests were added afterward. Windows subsequently
-blocked test executables through its Code Integrity policy. The final revision
-compiles and passed `go vet`, but the new tests still need to run and the 100%
-coverage target remains unverified. No production files are excluded from coverage.
+**The current suite passes with 100.0% statement coverage** on Windows/amd64
+with Go 1.26.4. Reference comparisons report identical encoded bytes and zero
+PCM differences in both modes, with and without enhancement. Tests and
+benchmarks report **0 B/op and 0 allocs/op**. No production files are excluded
+from coverage. Static analysis with `go vet ./...` also passes.
+
+The final 60-second fuzzing campaign passed with 807,108 executions and four
+workers. Controlled local benchmarks measured approximately 4x faster long-loss
+Conceal and 14-16% faster Encode. See [VALIDATION.md](VALIDATION.md) for the
+measurements, validation scope, and remaining platform checks.
 
 Reference tests use 320 frames per mode, covering silence, impulses, sine waves,
-noise, PCM extremes, and isolated and consecutive packet losses. In the completed
-run before the latest enhancement fix, encoded bytes and decoded samples matched
-the C reference executable with the corrections applied at that time. The test
+noise, PCM extremes, and isolated and consecutive packet losses. The test
 requires identical encoded bytes and allows a maximum difference of one PCM unit
-across platforms. This differential test corpus is not a complete conformance
-certification.
+across platforms; the Windows tests reported zero differences. This
+differential test corpus is not a complete conformance certification.
 
 The original C sources, corrections, and test vectors are in `testdata/`.
 `tools/generate_inputs.py` recreates the inputs, and `tools/generate_vectors.py`
@@ -108,6 +120,10 @@ Section 4.5 of the RFC permits PLC variations without affecting interoperability
    before recovery interpolation. The reference reuses `lag` at a different
    scale and can return twice its intended value, causing an access outside
    the history buffer during the next PLC call.
+4. **Subnormal filter tails:** the Go decoder clears synthesis and high-pass
+   subnormal history before processing each frame. The C oracle does not apply
+   this cleanup. Internal floating-point states can therefore differ, while
+   encoded bytes and decoded int16 PCM remain identical in the tested corpus.
 
 Provably unreachable branches were also removed: `CB_RESRANGE == -1` when the
 constant is 34, `i < lengthIn` in the extension starting at `lengthIn+2`, and

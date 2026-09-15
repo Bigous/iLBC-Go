@@ -13,8 +13,8 @@ Before the first publication:
    go test -fuzz FuzzDecode -fuzztime 60s
    ```
 
-2. Confirm 100% coverage and update `README.md` and `VALIDATION.md` with
-   the actual results. This target has not yet been verified.
+2. Preserve the confirmed 100% statement coverage when making changes.
+   The completed diagnostics and fuzzing campaigns are recorded in `VALIDATION.md`. Repeat relevant checks after subsequent code changes.
 3. Choose the public module path, such as `github.com/YOUR_USERNAME/iLBC-Go`,
    and update the `module` directive in `go.mod`, the import in
    `example_test.go`, and the installation examples in the README.

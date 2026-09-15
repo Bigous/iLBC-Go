@@ -6,3 +6,4 @@ coverage
 *.prof
 __pycache__/
 *.pyc
+diagnostics/
