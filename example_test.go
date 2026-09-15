@@ -2,6 +2,7 @@ package ilbc_test
 
 import (
 	"fmt"
+
 	"github.com/Bigous/iLBC-Go"
 )
 

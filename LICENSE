@@ -19,16 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-Scope and third-party material
------------------------------
-
-The MIT license above applies to original contributions to iLBC-Go, including
-the Go API, original implementation changes, tests, tooling, and documentation.
-It does not replace the rights, notices, or conditions applicable to material
-derived from RFC 3951 Appendix A, including the translated codec and tables.
-
-The RFC-derived material and the bundled C reference retain the Internet
-Society copyright and the applicable BCP 78 terms. See LICENSE-RFC3951 and
-NOTICE for the original notices, provenance, and licensing references.
-Redistributions must preserve these notices as well as the MIT notice.
