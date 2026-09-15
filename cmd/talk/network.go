@@ -41,7 +41,9 @@ func handshake(ctx context.Context, conn *net.UDPConn, remote *net.UDPAddr) (*pe
 		}
 		p.session = binary.BigEndian.Uint64(id[:]) | 1
 	}
-	var data [maxDatagram + 1]byte // Detect oversized datagrams; never decode a truncated valid prefix.
+	// Read a complete UDP payload so oversized input is discarded by validation
+	// rather than terminating a Windows socket with WSAEMSGSIZE.
+	var data [65535]byte
 	for {
 		if err := ctx.Err(); err != nil {
 			return nil, err
@@ -83,11 +85,14 @@ func handshake(ctx context.Context, conn *net.UDPConn, remote *net.UDPAddr) (*pe
 }
 
 func (p *peer) receive(ctx context.Context, incoming chan<- packet) error {
-	var data [maxDatagram + 1]byte
+	var data [65535]byte
 	lastAudio := time.Now()
 	for {
 		if err := ctx.Err(); err != nil {
 			return err
+		}
+		if time.Since(lastAudio) > 10*time.Second {
+			return fmt.Errorf("peer timed out: no audio received for 10 seconds")
 		}
 		if err := p.conn.SetReadDeadline(time.Now().Add(250 * time.Millisecond)); err != nil {
 			return err
@@ -95,9 +100,6 @@ func (p *peer) receive(ctx context.Context, incoming chan<- packet) error {
 		n, from, err := p.conn.ReadFromUDP(data[:])
 		if err != nil {
 			if timeout, ok := err.(net.Error); ok && timeout.Timeout() {
-				if time.Since(lastAudio) > 10*time.Second {
-					return fmt.Errorf("peer timed out: no audio received for 10 seconds")
-				}
 				continue
 			}
 			return err

@@ -52,6 +52,9 @@ func TestHandshakeAndPeerFiltering(t *testing.T) {
 	}
 	incoming := make(chan packet, 4)
 	go func() { failures <- s.receive(ctx, incoming) }()
+	if _, err := stranger.WriteToUDP(make([]byte, 2048), server.LocalAddr().(*net.UDPAddr)); err != nil {
+		t.Fatal(err)
+	}
 	spoof := &peer{conn: stranger, address: s.conn.LocalAddr().(*net.UDPAddr), session: s.session}
 	if err := spoof.send(packet{kind: kindAudio, seq: 90}); err != nil {
 		t.Fatal(err)

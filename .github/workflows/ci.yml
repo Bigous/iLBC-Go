@@ -57,3 +57,4 @@ jobs:
           go-version: stable
           cache: false
       - run: go -C cmd/talk test -race ./...
+      - run: go -C cmd/talk test -run '^$' -fuzz FuzzPacket -fuzztime 60s -parallel 4

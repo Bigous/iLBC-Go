@@ -38,6 +38,10 @@ type waveDevice struct {
 	next    int
 }
 
+// Keep Go pointers passed as uintptr alive and off movable goroutine stacks
+// throughout the wrapper call, just as syscall.Syscall does for direct calls.
+//
+//go:uintptrescapes
 func waveCall(name string, args ...uintptr) error {
 	code, _, _ := winmm.NewProc(name).Call(args...)
 	if code != 0 {
