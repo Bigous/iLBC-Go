@@ -10,12 +10,14 @@ From the repository root in PowerShell:
 ```powershell
 .\tools\coverage.ps1
 go vet ./...
+go -C cmd/talk test ./...
+go -C cmd/talk vet ./...
 go test ./src -run '^$' -fuzz FuzzDecode -fuzztime 60s -parallel 4
 git diff --check
 ```
 
 Keep 100% statement coverage, review reference comparisons, and wait for the
-GitHub Go 1.22 and stable jobs to pass on the release commit. Preserve LICENSE,
+GitHub codec, cross-platform talk, race, and fuzz jobs to pass on the release commit. Preserve LICENSE,
 LICENSE-RFC3951, NOTICE, and reference source notices when distributing.
 
 Commit and push the release changes, then create a tag on that tested commit:

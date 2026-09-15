@@ -113,3 +113,24 @@ in this local run. GitHub run 34972213321 passed on Ubuntu with Go 1.22 and stab
 consider longer fuzzing campaigns before release.
 
 Direct execution of the rebuilt repository coverage executable was blocked by Windows Application Control in this session. Validation through go test succeeded; no application control policy was changed.
+
+## src layout and talk validation
+
+The codec and reference fixtures now live under `src/`. The public package
+import is `github.com/Bigous/iLBC-Go/src`; the root module path is unchanged.
+The coverage script still reports 100.0% codec statement coverage after the move.
+
+The separate `cmd/talk` module builds without CGo. GitHub run
+[35007064822](https://github.com/Bigous/iLBC-Go/actions/runs/35007064822)
+passed native builds and synthetic-audio tests on Windows, Linux, and macOS,
+Go 1.22 compatibility on Ubuntu, and Linux race detection. Its 60-second
+packet-parser fuzz campaign passed with 4,270,007 executions and seven new
+interesting inputs. Local cross-builds cover amd64 and arm64 on all three OSes.
+The Windows executable's `--help` command also ran successfully.
+
+Talk tests cover bidirectional UDP transport through the real codec with
+synthetic microphone/output buffers, malformed and oversized packets, peer
+and session filtering, handshake retries, timeouts, packet loss/reordering,
+sequence wraparound, bounded queues, and shutdown. These are separate from
+the codec's coverage result. Native audio device access is not exercised by
+CI, and a two-machine microphone/speaker listening test remains a manual check.
