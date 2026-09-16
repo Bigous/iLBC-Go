@@ -134,3 +134,9 @@ and session filtering, handshake retries, timeouts, packet loss/reordering,
 sequence wraparound, bounded queues, and shutdown. These are separate from
 the codec's coverage result. Native audio device access is not exercised by
 CI, and a two-machine microphone/speaker listening test remains a manual check.
+
+## User-reported physical Windows validation
+
+After publication of v1.0.0, the user confirmed that talk worked as expected
+on a physical Windows machine. This supplements the automated synthetic-audio
+tests. Physical Linux and macOS audio validation remains unconfirmed.
